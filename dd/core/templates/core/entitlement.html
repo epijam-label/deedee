@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="row mt-3">
+        <div class="col text-center">
+            <p>
+               <img src="{% static 'images/epijam.png' %}"> 
+            </p>
+            <h2>{{ entitlement.source_policy.label }}</h2>
+            <h4><em>{{ entitlement.recipient }}</em></h4>
+            <p class="mt-4">
+               {% if entitlement.has_more_tokens %}
+               <a href="/entitlement/{{ entitlement.pk }}/redeem/" class="btn btn-lg btn-success">
+                   {% if entitlement.assets.count > 1 %}
+                   Download All Now
+                   {% else %}
+                   Download Now
+                   {% endif %}
+               </a> 
+               {% else %}
+               <p class="lead">This download has already been redeemed.</p>
+               {% endif %}
+            </p>
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h5>This Bundle Includes</h5>
+                </div>
+                <div class="card-body">
+                    {% for asset in entitlement.assets.all %}
+                    <p>{{ asset.label }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+
+

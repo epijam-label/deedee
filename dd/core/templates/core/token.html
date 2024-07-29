@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="row mt-3">
+        <div class="col text-center">
+            <p>
+               <img src="{% static 'images/epijam.png' %}"> 
+            </p>
+            <h2>{{ entitlement.source_policy.label }}</h2>
+            <h4><em>{{ entitlement.recipient }}</em></h4>
+            {% if download_session and download_session.is_valid %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h4>Download Your Files Here</h4>
+                </div>
+                <div class="card-body">
+                    {% for asset in download_session.assets.all %}
+                    <p>
+                       <a href="/download/{{ download_session.pk }}/{{ asset.pk }}/">{{ asset.label }}</a> 
+                    </p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <p class="lead">Sorry this download has expired.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
