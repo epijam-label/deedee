@@ -21,6 +21,7 @@ from dd.core import apiviews, views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("card/<uuid:card_id>/", views.download_card),
     path("entitlement/<uuid:entitlement_id>/", views.entitlement),
     path("entitlement/<uuid:entitlement_id>/redeem/", views.redeem_entitlement),
     path("token/<uuid:token_id>/", views.download_token),

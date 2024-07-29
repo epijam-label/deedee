@@ -33,39 +33,14 @@ class Asset(DDModel):
 
 class Bundle(DDModel):
     """
-    A SKU. Comes with one or more entitlements.
+    A SKU. Creates entitlements.
     """
 
     label = models.CharField(blank=True, max_length=100)
     available = models.BooleanField(default=True)
-
-    def grant_entitlements(self, recipient_email):
-        """
-        Grants recipient all associated entitlements. Called on bundle
-        purchase fulfillment.
-        """
-        return [
-            ent_policy.grant_entitlement(recipient_email)
-            for ent_policy in self.entitlement_policies.all()
-        ]
-
-    def __str__(self):
-        return f"{self.label} ({self.id})"
-
-
-class EntitlementPolicy(DDModel):
-    """
-    An entitlement that is granted with a bundle. This is the policy that
-    creates recipient specific entitlements.
-    """
-
-    bundle = models.ForeignKey(
-        Bundle, related_name="entitlement_policies", on_delete=models.CASCADE
-    )
-    assets = models.ManyToManyField(Asset, related_name="entitlement_policies")
+    assets = models.ManyToManyField(Asset, related_name="bundles")
     token_allowance_policy = models.IntegerField(default=1)
     expire_after = models.IntegerField(blank=True, null=True)
-    label = models.CharField(blank=True, max_length=100)
 
     def grant_entitlement(self, recipient_email):
         """
@@ -80,7 +55,7 @@ class EntitlementPolicy(DDModel):
             token_allowance=self.token_allowance_policy,
             recipient=recipient_email,
             expiry=expiry_date,
-            source_policy=self,
+            source_bundle=self,
         )
         for asset in self.assets.all():
             ent.assets.add(asset)
@@ -91,6 +66,32 @@ class EntitlementPolicy(DDModel):
         return f"{self.label} ({self.id})"
 
 
+class DownloadCard(DDModel):
+    """
+    A download card is representative of a physical card that is inserted
+    into physical media, entitling the user to download a bundle.
+    """
+
+    bundle = models.ForeignKey(
+        Bundle, related_name="download_cards", on_delete=models.CASCADE
+    )
+    email_capture_required = models.BooleanField(default=False)
+    recipient_email = models.EmailField(null=True)
+    used = models.BooleanField(default=False)
+
+    def grant_entitlement(self):
+        """
+        Grants the entitlement.
+        """
+        if not self.recipient_email:
+            raise ValueError("Must define recipient email")
+
+        ent = self.bundle.grant_entitlement(self.recipient_email)
+        self.used = True
+        self.save()
+        return ent
+
+
 class Entitlement(DDModel):
     """
     An entitlement granted to a user to create one or more download tokens.
@@ -99,8 +100,8 @@ class Entitlement(DDModel):
     assets = models.ManyToManyField(Asset, related_name="entitlements")
     token_allowance = models.IntegerField(default=1)
     recipient = models.EmailField()  # the grantee of the entitlement
-    source_policy = models.ForeignKey(
-        EntitlementPolicy,
+    source_bundle = models.ForeignKey(
+        Bundle,
         null=True,
         related_name="entitlements",
         on_delete=models.SET_NULL,

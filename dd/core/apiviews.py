@@ -25,9 +25,9 @@ class EntitleView(views.APIView):
             if not recipient:
                 return Response(status=status.HTTP_409_CONFLICT)
 
-            entitlements = bundle.grant_entitlements(recipient)
+            entitlement = bundle.grant_entitlement(recipient)
             return Response(
-                {"entitlements": [ent.pk for ent in entitlements]},
+                {"entitlement": entitlement.pk},
                 status=status.HTTP_201_CREATED,
             )
 

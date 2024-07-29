@@ -4,7 +4,33 @@ Regular webviews.
 from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect, FileResponse
 
-from dd.core.models import Entitlement, Token, DownloadSession, Asset
+from dd.core.models import Entitlement, Token, DownloadSession, Asset, DownloadCard
+from dd.core.forms import EmailCaptureForm
+
+
+def download_card(request, card_id):
+    """
+    Views a download card.
+    """
+    try:
+        card = DownloadCard.objects.get(pk=card_id)
+
+        # check if the card has been used
+        form = None
+        if request.method == "POST" and not card.used:
+            form = EmailCaptureForm(request.POST)
+            if form.is_valid():
+                form.write_email(card)
+                entitlement = card.grant_entitlement()
+                return HttpResponseRedirect(f"/entitlement/{entitlement.pk}/")
+        else:
+            form = EmailCaptureForm()
+
+        return render(
+            request, "core/download_card.html", context={"card": card, "form": form}
+        )
+    except DownloadCard.DoesNotExist:
+        raise Http404()
 
 
 def entitlement(request, entitlement_id):
