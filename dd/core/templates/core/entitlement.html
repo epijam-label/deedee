@@ -22,6 +22,9 @@
                </a> 
                {% else %}
                <p class="lead">This download has already been redeemed.</p>
+               {% if customer_service_email %}
+               <p>For assistance, please email <a href="mailto:{{ customer_service_email }}">{{ customer_service_email }}</a>.</p>
+               {% endif %}
                {% endif %}
             </p>
             <div class="card mt-5">

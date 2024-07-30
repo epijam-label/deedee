@@ -3,6 +3,7 @@ Regular webviews.
 """
 from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect, FileResponse
+from django.conf import settings
 
 from dd.core.models import Entitlement, Token, DownloadSession, Asset, DownloadCard
 from dd.core.forms import EmailCaptureForm
@@ -40,7 +41,12 @@ def entitlement(request, entitlement_id):
     try:
         entitlement_obj = Entitlement.objects.get(pk=entitlement_id)
         return render(
-            request, "core/entitlement.html", context={"entitlement": entitlement_obj}
+            request,
+            "core/entitlement.html",
+            context={
+                "entitlement": entitlement_obj,
+                "customer_service_email": settings.CUSTOMER_SERVICE_EMAIL,
+            },
         )
     except Entitlement.DoesNotExist:
         raise Http404()
@@ -75,7 +81,11 @@ def download_token(request, token_id):
         return render(
             request,
             "core/token.html",
-            context={"token": token, "download_session": download_session},
+            context={
+                "token": token,
+                "download_session": download_session,
+                "customer_service_email": settings.CUSTOMER_SERVICE_EMAIL,
+            },
         )
 
     except Token.DoesNotExist:

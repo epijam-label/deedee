@@ -26,6 +26,9 @@
             </div>
             {% else %}
             <p class="lead">Sorry this download has expired.</p>
+            {% if customer_service_email %}
+            <p>For assistance, please email <a href="mailto:{{ customer_service_email }}">{{ customer_service_email }}</a>.</p>
+            {% endif %}
             {% endif %}
         </div>
     </div>
