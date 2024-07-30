@@ -98,7 +98,7 @@ class Entitlement(DDModel):
     """
 
     assets = models.ManyToManyField(Asset, related_name="entitlements")
-    token_allowance = models.IntegerField(default=1)
+    token_allowance = models.IntegerField(default=3)
     recipient = models.EmailField()  # the grantee of the entitlement
     source_bundle = models.ForeignKey(
         Bundle,
@@ -106,7 +106,7 @@ class Entitlement(DDModel):
         related_name="entitlements",
         on_delete=models.SET_NULL,
     )
-    expiry = models.DateField(null=True)
+    expiry = models.DateField(null=True, blank=True)
 
     def has_more_tokens(self):
         """
@@ -131,6 +131,12 @@ class Entitlement(DDModel):
         self.token_allowance -= 1
         self.save()
         return token
+
+    def __str__(self):
+        if self.source_bundle:
+            return f"{self.source_bundle} for {self.recipient}"
+        else:
+            return f"Entitlement {self.pk} (no source bundle) for {self.recipient}"
 
     class AllowanceExceeded(Exception):
         """
