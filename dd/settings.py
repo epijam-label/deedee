@@ -177,3 +177,10 @@ LOGGING = {
         },
     },
 }
+
+# ===========
+# = Shopify =
+# ===========
+
+SHOPIFY_HMAC_HEADER = os.environ.get("DD_SHOPIFY_HMAC_HEADER", None)
+SHOPIFY_API_SECRET = os.environ.get("DD_SHOPIFY_API_SECRET", None)

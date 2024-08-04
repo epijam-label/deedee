@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from dd.core.models import Bundle
+from dd.utils import verify_shopify_webhook
 
 
 class EntitleView(views.APIView):
@@ -40,11 +41,16 @@ class FulfillmentView(views.APIView):
     Creates an entitlement from a Shopify fulfillment webhook, but also sends
     notification email to the entitled.
     """
+    
+    authentication_classes = [] # open endpoint
 
     def post(self, request):
         """
         Creates the entitlement from the payload.
         """
+        if not verify_shopify_webhook(request=request):
+            return Response(status=status.HTTP_403) # TODO: refactor to auth class
+        
         # TODO: The actual webhook structure isn't 100% clear, so it's necessary
         # to figure out whether the stuff we need in order to create the fulfillment
         # is present and where it lives in the JSON structure exactly.
