@@ -19,9 +19,9 @@ def verify_shopify_webhook(request):
     """
     log.debug("Debugging verify_shopify_webhook")
     shopify_hmac_header = request.META.get(settings.SHOPIFY_HMAC_HEADER)
-    log.info(f"hmac header is: {shopify_hmac_header}")
+    log.debug(f"hmac header is: {shopify_hmac_header}")
     encoded_secret = settings.SHOPIFY_API_SECRET.encode("utf-8")
-    log.info(f"encoded secret is: {encoded_secret}")
+    log.debug(f"encoded secret is: {encoded_secret}")
     digest = hmac.new(
         encoded_secret,
         request.body,
