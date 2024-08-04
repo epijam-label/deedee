@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 if not DEBUG:
     ALLOWED_HOSTS = [
         "dd.epijam.com", # TODO: add domains...
+        "dd-epijam-41a323b8ee73.herokuapp.com",
     ]
 
 
