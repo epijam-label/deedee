@@ -27,4 +27,5 @@ urlpatterns = [
     path("token/<uuid:token_id>/", views.download_token),
     path("download/<uuid:download_session_id>/<uuid:asset_id>/", views.download_asset),
     # path("api/entitle/<uuid:bundle_id>/", apiviews.EntitleView.as_view()),
+    path("api/fulfill/", apiviews.FulfillmentView.as_view()),
 ]

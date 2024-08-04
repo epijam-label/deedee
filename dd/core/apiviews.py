@@ -33,3 +33,32 @@ class EntitleView(views.APIView):
 
         except Bundle.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class FulfillmentView(views.APIView):
+    """
+    Creates an entitlement from a Shopify fulfillment webhook, but also sends
+    notification email to the entitled.
+    """
+
+    def post(self, request):
+        """
+        Creates the entitlement from the payload.
+        """
+        # TODO: The actual webhook structure isn't 100% clear, so it's necessary
+        # to figure out whether the stuff we need in order to create the fulfillment
+        # is present and where it lives in the JSON structure exactly.
+
+        # Job here is to create the entitlement, send a notification email
+        # to the customer
+        print(request.data)
+        return Response(status=status.HTTP_200_OK)
+
+        # ent_items = request.data["fulfillment"]["fulfillment_line_items"]
+
+
+#         customer_email = request.data["email"]
+#         for ent_item in ent_items:
+#             item_sku = ent_item["line_item"]["variant"]["sku"]
+#             try:
+#                 bundle = Bundle.objects.get(pk=sku)
