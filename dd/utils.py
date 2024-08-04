@@ -14,7 +14,9 @@ def verify_shopify_webhook(request):
     Verfies the request as a genuine shopify webhook.
     """
     shopify_hmac_header = request.META.get(settings.SHOPIFY_HMAC_HEADER)
+    print(f"hmac header is: {shopify_hmac_header}")
     encoded_secret = settings.SHOPIFY_API_SECRET.encode("utf-8")
+    print(f"encoded secret is: {encoded_secret}")
     digest = hmac.new(
         encoded_secret,
         request.body,
