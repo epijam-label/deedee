@@ -1,6 +1,7 @@
 """
 Views for DD.
 """
+import logging
 
 from rest_framework import views
 from rest_framework import status
@@ -8,6 +9,9 @@ from rest_framework.response import Response
 
 from dd.core.models import Bundle
 from dd.utils import verify_shopify_webhook
+
+
+log = logging.getLogger(__file__)
 
 
 class EntitleView(views.APIView):
@@ -58,14 +62,25 @@ class FulfillmentView(views.APIView):
 
         # Job here is to create the entitlement, send a notification email
         # to the customer
-        print(request.data)
+        
+        log.debug(f"Fulfillment view processing data: {request.data}")
+        
+        email = request.data.get("email", None)
+        line_items = request.data.get("line_items", None)
+        if email and line_items:
+            for line_item in line_items:
+                bundle_id = line_item.get("sku", None)
+                if bundle_id:
+                    try:
+                        bundle = Bundle.objects.get(pk=bundle_id)
+                        bundle.grant_entitlement(email) # should send notification inside here
+                    except Bundle.DoesNotExist:
+                        log.warning(f"Cannot find bundle {bundle_id}")
+                else:
+                    log.warning(f"No bundle defined for sku for line item {line_item}")
+        else:
+            log.warning(f"Missing email or line items for {email} and {line_items}")
+        
         return Response(status=status.HTTP_200_OK)
 
-        # ent_items = request.data["fulfillment"]["fulfillment_line_items"]
-
-
-#         customer_email = request.data["email"]
-#         for ent_item in ent_items:
-#             item_sku = ent_item["line_item"]["variant"]["sku"]
-#             try:
-#                 bundle = Bundle.objects.get(pk=sku)
+        
