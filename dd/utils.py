@@ -28,4 +28,5 @@ def verify_shopify_webhook(request):
         digestmod=hashlib.sha256,
     ).digest()
     computed_hmac = base64.b64encode(digest)
+    log.debug(f"computed hmac is: {computed_hmac}")
     return hmac.compare_digest(computed_hmac, shopify_hmac_header.encode("utf-8"))
